@@ -25,12 +25,12 @@ async def create_purchase_order(purchase: PurchaseOrderCreate):
             detail=str(e)
         )
 
-@router.get("/{order_number}", response_model=SuccessResponse[PurchaseOrderResponse])
-def get_purchase_order(order_number:str):
-    response = table.get_item(
-        Key={"empId": emp_id}
-    )
-    return response.get("Item")
+# @router.get("/{order_number}", response_model=SuccessResponse[PurchaseOrderResponse])
+# def get_purchase_order(order_number:str):
+#     response = table.get_item(
+#         Key={"empId": emp_id}
+#     )
+#     return response.get("Item")
 
 @router.delete("/{order_number}", response_model=SuccessResponse)
 async def delete_purchase_order(order_number: str):
