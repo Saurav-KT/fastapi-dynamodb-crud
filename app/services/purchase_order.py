@@ -1,3 +1,4 @@
+from boto3.dynamodb.conditions import ConditionAttributeBase
 from botocore.exceptions import ClientError
 from app.utils.exception import DuplicateOrderError, OrderNotFoundError, TableNotFoundError, PermissionDeniedError
 
@@ -16,6 +17,25 @@ def create_order(order_dict):
         if e.response["Error"]["Code"] == "ConditionalCheckFailedException":
             raise DuplicateOrderError(f"Order {order_dict["order_number"]} already exists")
         raise
+
+
+def get_order(order_number: str):
+
+    try:
+        response= tbl_purchase_order.get_item(Key={"order_number": order_number}
+                                               )
+        item= response.get["items"]
+        if not item:
+            raise OrderNotFoundError("Order not found")
+
+        return item
+
+    except ClientError as e:
+        error_code = e.response["Error"]["Code"]
+        if error_code == "ResourceNotFoundException":
+            raise TableNotFoundError("Table not found")
+        else:
+            raise
 
 
 

@@ -1,60 +1,43 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, status
 from app.model.purchase_order import PurchaseOrderCreate, PurchaseOrderResponse
-from app.services.purchase_order import create_order,delete_order
+from app.services.purchase_order import create_order, delete_order, get_order
 from app.utils.response import success_response, SuccessResponse
-from app.utils.exception import DuplicateOrderError, OrderNotFoundError, TableNotFoundError,PermissionDeniedError
 
 router = APIRouter(
-    prefix='/orders',
-    tags=['Orders']
+    prefix="/orders",
+    tags=["Orders"]
 )
 
 
-@router.post("", response_model=SuccessResponse[PurchaseOrderResponse])
+@router.post("", response_model=SuccessResponse)
 async def create_purchase_order(purchase: PurchaseOrderCreate):
-    try:
-        purchase_order = purchase.model_dump()
-        order = create_order(purchase_order)
-        if order:
-            return success_response("order created successfully", status_code=status.HTTP_201_CREATED)
+    purchase_order = purchase.model_dump()
+    create_order(purchase_order)
 
-    except DuplicateOrderError as e:
-        # Duplicate order
-        raise HTTPException(
-            status_code=409,  # Conflict
-            detail=str(e)
-        )
+    return success_response(
+        message="Order created successfully",
+        status_code=status.HTTP_201_CREATED
+    )
 
-# @router.get("/{order_number}", response_model=SuccessResponse[PurchaseOrderResponse])
-# def get_purchase_order(order_number:str):
-#     response = table.get_item(
-#         Key={"empId": emp_id}
-#     )
-#     return response.get("Item")
+
+@router.get(
+    "/{order_number}",
+    response_model=SuccessResponse[PurchaseOrderResponse]
+)
+def get_purchase_order(order_number: str):
+    order = get_order(order_number)
+
+    return success_response(
+        data=order,
+        status_code=status.HTTP_200_OK
+    )
+
 
 @router.delete("/{order_number}", response_model=SuccessResponse)
 async def delete_purchase_order(order_number: str):
-    try:
-       is_deleted= delete_order(order_number)
-       if is_deleted:
-           return success_response("Order deleted successfully", status_code=status.HTTP_200_OK)
+    delete_order(order_number)
 
-
-    except OrderNotFoundError:
-       raise HTTPException(
-           status_code=status.HTTP_404_NOT_FOUND,
-           detail="Order not found"
-       )
-
-    except PermissionDeniedError:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Access denied"
-        )
-
-    except TableNotFoundError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail="Service configuration error"
-        )
-
+    return success_response(
+        message="Order deleted successfully",
+        status_code=status.HTTP_200_OK
+    )

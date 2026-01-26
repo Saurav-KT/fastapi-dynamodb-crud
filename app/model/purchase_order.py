@@ -25,3 +25,7 @@ class PurchaseOrderCreate(BaseModel):
 
 class PurchaseOrderResponse(ORMBaseModel):
     order_number: str = Field(..., description="purchase order number")
+    customer_id: int = Field(..., description="unique customer id")
+    items: list[Item] = Field(..., description="list of purchase item")
+    total: Decimal | None = Field(default=None, description="total purchase amount")
+    payment_id: UUID = Field(..., description="payment reference id")
