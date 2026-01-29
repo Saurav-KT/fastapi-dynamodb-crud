@@ -28,7 +28,7 @@ This ZIP is now ready to be uploaded as an AWS Lambda layer.
 
 Create lambda layer in AWS management console
 
-![img_1.png](img_1.png)
+![img_1.png](resources/img_1.png)
 
 There are three ways to create lambda function
 1. Author from Scratch
