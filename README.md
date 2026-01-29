@@ -60,7 +60,7 @@ Linux/Mac
 
 Upload ZIP to Lambda
 
-![img.png](img.png)
+![img.png](resources/img.png)
 
 Attach Lambda Layer (Dependencies)
 
@@ -77,17 +77,17 @@ python/
  ├── mangum/
  ├── pydantic/
 
-![img_2.png](img_2.png)
+![img_2.png](resources/img_2.png)
 
 Runtime setting change Handler
 
 app.main.handler
 
-![img_3.png](img_3.png)
+![img_3.png](resources/img_3.png)
 
 When the Lambda function is created, it will be automatically attached to a **basic execution role**.
 
-![img_4.png](img_4.png)
+![img_4.png](resources/img_4.png)
 
 This coding exercise uses **DynamoDB** to perform CRUD operations, so a **custom IAM policy with least-privilege permissions** must be created and attached to the Lambda execution role.
 
@@ -131,34 +131,34 @@ Creating a custom IAM policy ensures the Lambda function can access only the spe
 
 Without this policy, any attempt by the Lambda function to access DynamoDB will fail with an AccessDeniedException.
 
-![img_5.png](img_5.png)
+![img_5.png](resources/img_5.png)
 
 Once completed, create a **DynamoDB table** named **`purchase_order`** with **`order_number`** as the **partition key**.
 
-![img_6.png](img_6.png)
+![img_6.png](resources/img_6.png)
 
 API gateway
 
 Choose an API type > HTTP API> click on Build
 Enter the unique API name
 
-![img_7.png](img_7.png)
+![img_7.png](resources/img_7.png)
 
 Add an **Integration** by selecting the **Lambda function** created in the previous steps. Make sure the **region matches** the region of the Lambda function.
 
-![img_8.png](img_8.png)
+![img_8.png](resources/img_8.png)
 
 Configure routes
 
-![img_9.png](img_9.png)
+![img_9.png](resources/img_9.png)
 
 Define stages such as **Dev, QA, and Prod**. For this exercise, I used **$default**.
 
-![img_10.png](img_10.png)
+![img_10.png](resources/img_10.png)
 
 After creation, obtain the **Invoke URL**.
 
-![img_11.png](img_11.png)
+![img_11.png](resources/img_11.png)
 
 Note that no authentication mechanism is used for this exercise; however, AWS typically uses **JWT** and **Lambda authorizers** for authentication.
 
@@ -178,8 +178,8 @@ Test the APIs using the payload below with a client tool such as **Postman**.
   "payment_id": "6f1d7e9e-4d4a-4b1a-b9a9-1f2e8cce0a1f"
 }
 
-![img_12.png](img_12.png)
+![img_12.png](resources/img_12.png)
 
 Verify the record in DynamoDB table
 
-![img_13.png](img_13.png)
+![img_13.png](resources/img_13.png)
