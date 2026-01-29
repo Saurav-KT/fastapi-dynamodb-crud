@@ -58,7 +58,7 @@ Linux/Mac
 `zip -r function.zip app main.py \
   -x "__pycache__/*" "*.pyc"`
 
-Upload ZIP to Lambda
+Upload ZIP to Lambda enter the basic information such as function name for example purchase-order-api-dev
 
 ![img.png](resources/img.png)
 
