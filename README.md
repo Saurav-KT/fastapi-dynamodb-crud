@@ -133,7 +133,7 @@ Without this policy, any attempt by the Lambda function to access DynamoDB will 
 
 ![img_5.png](resources/img_5.png)
 
-Once completed, create a **DynamoDB table** named **`purchase_order`** with **`order_number`** as the **partition key**.
+Once completed, create a **DynamoDB table** named **`purchase_order`** with **`order_number: String`** as the **partition key** and customer_id: Number as the **sort key**.
 
 ![img_6.png](resources/img_6.png)
 
@@ -148,7 +148,7 @@ Add an **Integration** by selecting the **Lambda function** created in the previ
 
 ![img_8.png](resources/img_8.png)
 
-Configure routes
+Configure routes /{proxy+}
 
 ![img_9.png](resources/img_9.png)
 
