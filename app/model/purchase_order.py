@@ -2,8 +2,10 @@ from pydantic import Field, BaseModel, ConfigDict, field_serializer
 from uuid import uuid4, UUID
 from decimal import Decimal
 
+
 class ORMBaseModel(BaseModel):
-    model_config = ConfigDict(from_attributes= True)
+    model_config = ConfigDict(from_attributes=True)
+
 
 class Item(BaseModel):
     item_number: str
@@ -11,7 +13,7 @@ class Item(BaseModel):
     price: Decimal = Field(..., gt=0)
 
 
-class PurchaseOrderCreate(BaseModel):
+class OrderCreateRequest(BaseModel):
     order_number: str = Field(..., description="purchase order number")
     customer_id: int = Field(..., description="unique customer id")
     items: list[Item] = Field(..., description="list of purchase item")
@@ -23,9 +25,14 @@ class PurchaseOrderCreate(BaseModel):
         return str(v)
 
 
-class PurchaseOrderResponse(ORMBaseModel):
+class OrderResponse(ORMBaseModel):
     order_number: str = Field(..., description="purchase order number")
     customer_id: int = Field(..., description="unique customer id")
     items: list[Item] = Field(..., description="list of purchase item")
     total: Decimal | None = Field(default=None, description="total purchase amount")
     payment_id: UUID = Field(..., description="payment reference id")
+
+
+class OrderUpdateRequest(BaseModel):
+    items: list[Item]
+    total: Decimal

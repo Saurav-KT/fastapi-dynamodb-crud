@@ -1,6 +1,7 @@
 from boto3.dynamodb.conditions import ConditionAttributeBase
 from botocore.exceptions import ClientError
 from app.utils.exception import DuplicateOrderError, OrderNotFoundError, TableNotFoundError, PermissionDeniedError
+from model.purchase_order import OrderUpdateRequest
 
 from .config import tbl_purchase_order
 
@@ -19,14 +20,18 @@ def create_order(order_dict):
         raise
 
 
-def get_order(order_number: str):
+def get_order(order_number: str, customer_id: int):
 
     try:
-        response= tbl_purchase_order.get_item(Key={"order_number": order_number}
+        response= tbl_purchase_order.get_item(
+            Key={
+                "order_number": order_number,
+                "customer_id": customer_id
+            }
                                                )
-        item= response.get["items"]
+        item= response.get("Item")
         if not item:
-            raise OrderNotFoundError("Order not found")
+            raise OrderNotFoundError(f"Order {order_number}/{customer_id} not found")
 
         return item
 
@@ -37,13 +42,50 @@ def get_order(order_number: str):
         else:
             raise
 
+# UPDATE
+def update_order(order_number: str, customer_id: int, order: OrderUpdateRequest):
+
+    try:
+        response = tbl_purchase_order.update_item(
+            Key={
+                "order_number": order_number,
+                "customer_id": customer_id
+            },
+            UpdateExpression="SET #items = :items, #total = :total",
+            ExpressionAttributeNames={
+                "#items": "items",
+                "#total": "total"
+            },
+            ExpressionAttributeValues={
+                ":items": [
+                    {
+                        "item_number": item.item_number,
+                        "qty": item.qty,
+                        "price": item.price
+                    }
+                    for item in order.items
+                ],
+                ":total": order.total
+            },
+            ConditionExpression="attribute_exists(order_number) AND attribute_exists(customer_id)",
+            ReturnValues="UPDATED_NEW"
+        )
+        return response["Attributes"]
+    except ClientError as e:
+        error_code = e.response["Error"]["Code"]
+
+        if error_code == "ConditionalCheckFailedException":
+            # record does not exist
+            raise OrderNotFoundError("Order not found")
+
+        else:
+            raise
 
 
-
-def delete_order(order_number: str):
+def delete_order(order_number: str, customer_id: int):
     try:
         tbl_purchase_order.delete_item(
-            Key={"order_number": order_number},
+            Key={"order_number": order_number, "customer_id": customer_id},
             ConditionExpression="attribute_exists(#on)",
             ExpressionAttributeNames={
                 "#on": "order_number"
